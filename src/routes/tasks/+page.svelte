@@ -2,6 +2,7 @@
     import { isLoggedIn } from '../../store';
     import { onMount } from 'svelte';
     import API_Url from '../../config.js'
+    import { base } from '$app/paths';
 
     let loggedIn = false;
     let token = '';
@@ -72,7 +73,7 @@
             <div class="row g-3">
                 {#each tasks as task}
                     <div class="col-md-4">
-                        <a href="/tasks/{task.id}" class="task-card-link">
+                        <a href="{base}/tasks/{task.id}" class="task-card-link">
                             <div class="card task-card shadow-sm">
                                 <div class="card-body">
                                     <h5 class="card-title">{task.assignmentName}</h5>
