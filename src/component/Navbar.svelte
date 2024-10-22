@@ -1,5 +1,4 @@
 <script>
-    import { base } from "$app/paths";
     import { userStore, isLoggedIn } from "../store.js"; // Importáljuk a felhasználói adat store-t
     
 
@@ -29,26 +28,26 @@
         <h4 class="mb-4"><a href="/">Menu</a></h4>
         
 
-        <a href="{base}/tasks">
+        <a href="/tasks">
             <i class="bi bi-list-task"></i> Feladatok
         </a>
         {#if user.role === "User"}
-        <a href="{base}/submission">
+        <a href="/submission">
             <i class="bi bi-upload"></i> Feladat beadása
         </a>
         {/if}
 
         {#if user.role === "Admin"}
-            <a href="{base}/finished_tasks">
+            <a href="/finished_tasks">
                 <i class="bi bi-check2-square"></i> Beadott feladatok
             </a>
-            <a href="{base}/new_task">
+            <a href="/new_task">
                 <i class="bi bi-file-earmark-plus"></i> Új feladat létrehozása
             </a>
         {/if}
 
         
-            <a href="{base}" on:click={logout}>
+            <a href="/" on:click={logout}>
                 <i class="bi bi-box-arrow-right"></i> Kijelentkezés
             </a>
         
