@@ -16,6 +16,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-netlify": "^4.3.5",
 		"@sveltejs/adapter-static": "^3.0.5"
 	}
 }
