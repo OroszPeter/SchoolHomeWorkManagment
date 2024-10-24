@@ -35,6 +35,9 @@
         <a href="/submission">
             <i class="bi bi-upload"></i> Feladat beadása
         </a>
+        <a href="/result">
+            <i class="bi bi-check"></i> Beadott feladatok
+        </a>
         {/if}
 
         {#if user.role === "Admin"}

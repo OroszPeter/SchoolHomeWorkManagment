@@ -31,6 +31,18 @@
             console.error("Error fetching task:", err.message); // Log the error for debugging
         }
     });
+
+    // Dátum formázó függvény
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        date.setHours(date.getHours() + 2); // Hozzáadunk 2 órát
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Hónap 0-tól kezdődik
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}`; // Év-hónap-nap óra:perc formátum
+    }
 </script>
 
 <div class="container">
@@ -38,11 +50,10 @@
         <h2>Feladat neve: {task ? task.assignmentName : "Betöltés..."}</h2>
         <p>
             <strong>Leírás:</strong>
-            {task ? task.description : "Betöltés..."}
-        </p>
+            {task ? task.description : "Betöltés..."}</p>
         <p>
             <strong>Határidő:</strong>
-            {task ? new Date(task.dueDate).toLocaleDateString() : "Betöltés..."}
+            {task ? formatDate(task.dueDate) : "Betöltés..."}
         </p>
 
         <h4>Csatolmányok</h4>
