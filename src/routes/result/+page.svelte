@@ -32,6 +32,7 @@
                     const submissionPromises = data.map(async submission => {
                         const assignmentId = submission.assignmentId;
                         const assignmentName = await getAssignmentName(assignmentId, jwtToken);
+                        
                         return {
                             ...submission,
                             taskName: assignmentName,
@@ -44,6 +45,7 @@
                         .then(completedSubmissions => {
                             submissions = completedSubmissions;
                         });
+                    loading = false;
                 })
                 .catch(error => {
                     console.error("Error fetching submissions:", error);
@@ -96,7 +98,7 @@
     </div>
 {:else}
 <div class="container mt-5">
-    <h1 class="mb-4"> Beadott feladatok </h1>
+    <h2 class="mb-4"> Beadott feladatok </h2>
     <table class="table table-striped">
         <thead>
             <tr>
