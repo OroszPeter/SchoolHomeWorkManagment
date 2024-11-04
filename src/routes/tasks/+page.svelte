@@ -25,6 +25,7 @@
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Token hozzáadása az Authorization fejlécbe
             }
+            
         });
 
         if (!response.ok) {
@@ -32,6 +33,7 @@
         }
 
         tasks = await response.json();
+        loading = false;
     } catch (err) {
         error = err.message;
     } finally {

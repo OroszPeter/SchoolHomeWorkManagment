@@ -47,6 +47,9 @@
             <a href="/new_task">
                 <i class="bi bi-file-earmark-plus"></i> Új feladat létrehozása
             </a>
+            <a href="/register">
+                <i class="bi bi-person-add"></i> Felhasználó regisztrálása
+            </a>
         {/if}
 
         
