@@ -1,13 +1,15 @@
 <script>
-    import { userStore, isLoggedIn } from "../store.js"; // Importáljuk a felhasználói adat store-t
+    import { userStore, isLoggedIn } from "../store.js";
     import { onMount } from "svelte";
-    import API_Url from '../config.js'
+    import { goto } from '$app/navigation';
+    import API_Url from '../config.js';
 
     let username = "";
     let password = "";
     let message = "";
+    let email = "";
 
-    // Ellenőrzi, hogy van-e token az oldalon betöltéskor
+    // Check for token on page load
     onMount(() => {
         const token = localStorage.getItem("jwtToken");
         if (token) {
@@ -15,7 +17,7 @@
         }
     });
 
-    async function handleSubmit(event) {
+    async function login(event) {
         event.preventDefault();
 
         const loginData = {
@@ -36,27 +38,52 @@
             );
 
             if (response.ok) {
-                const data = await response.json(); // JSON objektumként kezeljük a választ
-                const token = data.token; // A token mezőt kinyerjük
-                const userRole = data.user.role; // A role mezőt kinyerjük
+                const data = await response.json(); // Parse response as JSON
+                const token = data.token;
+                const userRole = data.user.role;
 
-                // Tároljuk a JWT tokent és a felhasználói role-t a localStorage-ban
+                // Store JWT token and user role in localStorage
                 localStorage.setItem("jwtToken", token);
-                localStorage.setItem("userRole", userRole); // Role tárolása
+                localStorage.setItem("userRole", userRole);
 
-                // Frissítjük a felhasználói adatokat a store-ban
-                userStore.set({
-                    username: data.user.username,
-                    email: data.user.email,
-                    id: data.user.id,
-                    role: userRole,
+                // Fetch additional user details by email
+                const emailResponse = await fetch(`${API_Url}/api/Account/get-user-by-email?email=${encodeURIComponent(data.user.email)}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
                 });
 
-                isLoggedIn.set(true); // Beállítjuk, hogy a felhasználó be van jelentkezve
-                message = "Sikeres bejelentkezés!";
+                if (emailResponse.ok) {
+                    const emailData = await emailResponse.json();
+                    console.log("User data by email:", emailData); // Log response to console
 
-                // Azonnali navigáció a menübe
-                // window.location.href = '/menu';
+                    // Store specific user details in localStorage
+                    localStorage.setItem("userId", emailData.id);
+                    localStorage.setItem("firstName", emailData.firstName);
+                    localStorage.setItem("lastName", emailData.lastName);
+                    localStorage.setItem("email", emailData.email);
+                    localStorage.setItem("userName", emailData.userName);
+                    localStorage.setItem("roles", JSON.stringify(emailData.roles)); // Store roles as JSON string
+
+                    // Update user data in the store
+                    userStore.set({
+                        userName: emailData.userName,
+                        email: emailData.email,
+                        id: emailData.id,
+                        firstName: emailData.firstName,
+                        lastName: emailData.lastName,
+                        roles: emailData.roles,
+                        role: userRole,
+                    });
+
+                    isLoggedIn.set(true); // Set login status to true
+                    message = "Sikeres bejelentkezés!";
+                } else {
+                    message = "Felhasználói adatok lekérése nem sikerült.";
+                }
+
             } else {
                 message = `Hiba történt: ${response.statusText}`;
             }
@@ -64,6 +91,32 @@
             message = `Hálózati hiba: ${error.message}`;
         }
     }
+
+    const login2fa = async (event) => {
+        event.preventDefault();
+
+        try {
+            const response = await fetch(`${API_Url}/api/Account/login2fa`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }), // Send email
+            });
+
+            if (response.ok) {
+                goto('/verification'); // Redirect to verification page
+            } else {
+                const errorData = await response.json();
+                console.error('Hiba:', errorData);
+                alert('A bejelentkezés nem sikerült. Kérlek, ellenőrizd az email címed.');
+            }
+        } catch (error) {
+            console.error('Hálózati hiba:', error);
+            alert('Hálózati hiba történt. Kérlek, próbáld újra később.');
+        }
+        localStorage.setItem('email', email);
+    };
 </script>
 
 {#if $isLoggedIn}
@@ -74,10 +127,19 @@
         </div>
     </div>
 {:else}
+
     <div class="container mt-5">
         <div class="login-form">
-            <h2>Bejelentkezés</h2>
-            <form on:submit={handleSubmit}>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                  <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Felhasználónév alapján</button>
+                  <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Kód alapján</button>
+                </div>
+              </nav>
+              <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+                    <h2 class="pt-3">Bejelentkezés</h2>
+            <form on:submit={login}>
                 <div class="mb-3">
                     <label for="username" class="form-label"
                         >Felhasználónév</label
@@ -106,6 +168,26 @@
                     >Bejelentkezés</button
                 >
             </form>
+                </div>
+                <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">
+                        <h2 class="pt-3">Bejelentkezés</h2>
+                        <form on:submit={login2fa}>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="email"
+                                    placeholder="Email"
+                                    bind:value={email} 
+                                    required
+                                />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Bejelentkezés</button>
+                        </form>
+                    </div>
+              </div>
+            
 
             {#if message}
                 <div class="mt-3">

@@ -1,7 +1,6 @@
 <script>
     import { userStore, isLoggedIn } from "../store.js"; // Importáljuk a felhasználói adat store-t
     
-
     let user = {};
 
     // Figyeljük a store-t, és frissítjük a user adatokat
@@ -22,25 +21,26 @@
         window.location.href = "/"; // Átirányítás a főoldalra
     }
 </script>
+
 {#if $isLoggedIn}
 <div class="dashboard-container">
     <nav class="menu min-vh-100">
         <h4 class="mb-4"><a href="/">Menu</a></h4>
-        
 
         <a href="/tasks">
             <i class="bi bi-list-task"></i> Feladatok
         </a>
-        {#if user.role === "User"}
-        <a href="/submission">
-            <i class="bi bi-upload"></i> Feladat beadása
-        </a>
-        <a href="/result">
-            <i class="bi bi-check"></i> Beadott feladatok
-        </a>
+
+        {#if user.roles && user.roles[0] === "User"}
+            <a href="/submission">
+                <i class="bi bi-upload"></i> Feladat beadása
+            </a>
+            <a href="/result">
+                <i class="bi bi-check"></i> Beadott feladatok
+            </a>
         {/if}
 
-        {#if user.role === "Admin"}
+        {#if user.roles && user.roles[0] === "Admin"}
             <a href="/finished_tasks">
                 <i class="bi bi-check2-square"></i> Beadott feladatok
             </a>
@@ -52,18 +52,16 @@
             </a>
         {/if}
 
-        
-            <a href="/" on:click={logout}>
-                <i class="bi bi-box-arrow-right"></i> Kijelentkezés
-            </a>
-        
+        <a href="/" on:click={logout}>
+            <i class="bi bi-box-arrow-right"></i> Kijelentkezés
+        </a>
 
         <div class="user-info">
-            <h5>{user.username}</h5>
+            <h5>{user.userName}</h5>
             <small>{user.email}</small><br>
             
-            {#if user.role}
-                <small class="role">Szerepkör: {user.role}</small>
+            {#if user.roles && user.roles.length > 0}
+                <small class="role">Szerepkör: {user.roles[0]}</small>
             {/if}
         </div>
     </nav>

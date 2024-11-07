@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import API_Url from '../../config.js';
 
-    // Állapotváltozók a bejelentkezés és az űrlapmezők ellenőrzéséhez
+    // State variables for login status and form inputs
     let loggedIn = false;
     let token = "";
     let firstname = "";
@@ -13,7 +13,7 @@
     let errorMessage = "";
     let successMessage = "";
 
-    // Ellenőrizze a bejelentkezési állapotot (token megléte)
+    // Check login status (token existence)
     function checkLogin() {
         token = localStorage.getItem("jwtToken");
         loggedIn = !!token;
@@ -23,7 +23,7 @@
         checkLogin();
     });
 
-    // Regisztrációs függvény, amely POST kérést küld az API-ra
+    // Registration function that sends a POST request to the API
     async function handleSubmit(event) {
         event.preventDefault();
         errorMessage = "";
@@ -38,6 +38,7 @@
         };
 
         try {
+            // First POST request to register the user
             const response = await fetch(
                 `${API_Url}/api/account/register`,
                 {
@@ -54,7 +55,13 @@
 
             if (response.ok) {
                 successMessage = "Sikeres regisztráció!";
+                
+                // Reset form after successful registration
                 resetForm();
+
+                // Second POST request to send email notification
+                await sendEmailNotification();
+
             } else {
                 errorMessage = `Hiba történt: ${isJson ? result.message : result}`;
             }
@@ -64,7 +71,37 @@
         }
     }
 
-    // Az űrlap alaphelyzetbe állítása sikeres regisztráció után
+    // Function to send email notification
+    async function sendEmailNotification() {
+        const emailData = {
+            toEmails: email, // Placeholder value for recipient email
+            subject: "",  // Placeholder value for email subject
+            body: ""      // Placeholder value for email body
+        };
+
+        try {
+            const emailResponse = await fetch(
+                `https://localhost:7296/api/Email/SendEmail`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(emailData)
+                }
+            );
+
+            if (!emailResponse.ok) {
+                const emailError = await emailResponse.json();
+                console.error("Email send error:", emailError);
+            }
+
+        } catch (error) {
+            console.error("Network error while sending email:", error);
+        }
+    }
+
+    // Reset form inputs after successful registration
     function resetForm() {
         firstname = "";
         lastname = "";
@@ -81,7 +118,7 @@
     </div>
 {:else}
     <div class="container my-5">
-        <h2 class="mb-4">Regisztráció</h2>
+        <h2 class="mb-4">Felhasználó regisztrálása</h2>
         <form on:submit={handleSubmit}>
             <div class="mb-3">
                 <label for="lastname" class="form-label">Vezetéknév</label>
@@ -133,14 +170,17 @@
 
             <div class="mb-3">
                 <label for="classname" class="form-label">Osztály</label>
-                <input
-                    type="text"
+                <select
                     class="form-control"
                     bind:value={classname}
                     id="classname"
-                    placeholder="Osztály"
                     required
-                />
+                >
+                    <option value="" disabled selected>Válassz osztályt</option>
+                    <option value="SZFT14">SZFT14</option>
+                    <option value="SZFT14-e">SZFT14-e</option>
+                    <option value="SZFT13-e">SZFT13-e</option>
+                </select>
             </div>
 
             {#if errorMessage}
