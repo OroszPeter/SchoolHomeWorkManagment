@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation'; // Ha használod az SvelteKit navigációt
-    import { API_Url } from '../../config';
+    let API_Url = 'http://sobschoolmanagement.tryasp.net';
 
     let email = '';
 
