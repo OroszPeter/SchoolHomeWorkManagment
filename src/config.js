@@ -1,2 +1,2 @@
 let API_Url;
-export default API_Url = "http://sobschoolmanagement.tryasp.net"
+export default API_Url = "https://sobschoolmanagement.tryasp.net"

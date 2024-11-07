@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { browser } from '$app/environment'; // A böngésző ellenőrzéséhez
+    import API_Url from '../../config.js'
 
     let submissions = [];
     let loading = true;
@@ -14,7 +15,7 @@
                 console.error("User ID or JWT token not found in localStorage");
             } else {
                 // Kérjük le a beadott feladatokat
-                fetch(`https://schoolmanagement-gedrcjfmb2c8hjfc.northeurope-01.azurewebsites.net/api/Submissions/get-user-submissions`, {
+                fetch(`${API_Url}/api/Submissions/get-user-submissions`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -51,13 +52,13 @@
                     console.error("Error fetching submissions:", error);
                 });
             }
-        }
+        }  
     });
 
     // Funkció a feladat neveinek lekérésére
     async function getAssignmentName(assignmentId, jwtToken) {
         try {
-            const response = await fetch(`https://schoolmanagement-gedrcjfmb2c8hjfc.northeurope-01.azurewebsites.net/api/Assignments/${assignmentId}`, {
+            const response = await fetch(`${API_Url}/api/Assignments/${assignmentId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
