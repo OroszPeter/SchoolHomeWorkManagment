@@ -1,7 +1,7 @@
 <script>
     import { goto } from '$app/navigation';
     import { userStore, isLoggedIn } from '../../store.js';
-    let API_Url = 'http://sobschoolmanagement.tryasp.net';
+    import API_Url from '../../config.js';
 
     let email = '';
     let code = ''; // 6 számjegyű kód változó

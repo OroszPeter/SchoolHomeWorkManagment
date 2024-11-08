@@ -12,7 +12,7 @@
 
     // Feladatok lekérése az API-ról
     async function fetchTasks() {
-    const token = localStorage.getItem('jwtToken'); // Token lekérése a localStorage-ból
+    token = localStorage.getItem('jwtToken'); // Token lekérése a localStorage-ból
     if (!token) {
         error = 'Nincs token, kérjük jelentkezzen be újra.';
         return;

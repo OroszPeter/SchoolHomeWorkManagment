@@ -51,6 +51,9 @@
                 <i class="bi bi-person-add"></i> Felhasználó regisztrálása
             </a>
         {/if}
+        <a href="/change_password">
+            <i class="bi bi-key"></i> Jelszó megváltoztatása
+        </a>
 
         <a href="/" on:click={logout}>
             <i class="bi bi-box-arrow-right"></i> Kijelentkezés
