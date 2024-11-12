@@ -60,7 +60,7 @@
         </a>
 
         <div class="user-info">
-            <h5>{user.userName}</h5>
+            <h5>{user.lastName} {user.firstName}</h5>
             <small>{user.email}</small><br>
             
             {#if user.roles && user.roles.length > 0}

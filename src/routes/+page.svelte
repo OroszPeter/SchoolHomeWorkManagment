@@ -57,7 +57,7 @@
 
                 if (emailResponse.ok) {
                     const emailData = await emailResponse.json();
-                    console.log("User data by email:", emailData); // Log response to console
+                    //console.log("User data by email:", emailData); // Log response to console
 
                     // Store specific user details in localStorage
                     localStorage.setItem("userId", emailData.id);
