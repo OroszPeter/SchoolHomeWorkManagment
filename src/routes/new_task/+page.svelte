@@ -6,11 +6,11 @@
     let token = "";
     let assignmentName = "";
     let description = "";
-    let dueDate = ""; // This will now store both date and time
+    let dueDate = ""; 
     let attachments = [];
     let errorMessage = "";
     let successMessage = "";
-
+    
     function checkLogin() {
         token = localStorage.getItem("jwtToken");
         loggedIn = !!token;
@@ -28,7 +28,7 @@
         const assignmentData = {
             assignmentName,
             description,
-            dueDate, // Ensure dueDate includes both date and time
+            dueDate,
         };
 
         try {
@@ -93,8 +93,15 @@
         description = "";
         dueDate = "";
         attachments = [];
+
+        // Ezzel beállítjuk az input értékét üresre
+        const fileInput = document.getElementById("taskAttachments");
+        if (fileInput) {
+            fileInput.value = ""; // Ürítsük ki a fájlmegválasztó mezőt
+        }
     }
 </script>
+
 
 {#if !loggedIn}
     <div>
