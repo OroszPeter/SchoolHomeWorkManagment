@@ -129,9 +129,9 @@
                     {/if}
                     <button type="button" class="btn btn-outline-secondary" on:click={toggleNewPasswordVisibility}>
                         {#if showNewPassword}
-                            <i class="bi bi-eye-slash-fill"></i>
-                        {:else}
                             <i class="bi bi-eye-fill"></i>
+                        {:else}
+                            <i class="bi bi-eye-slash-fill"></i>
                         {/if}
                     </button>
                 </div>

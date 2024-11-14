@@ -1,12 +1,28 @@
 <script>
     import { userStore, isLoggedIn } from "../store.js"; // Importáljuk a felhasználói adat store-t
-    
     let user = {};
+    let countdown = 0;
+    let countdownInterval;
 
-    // Figyeljük a store-t, és frissítjük a user adatokat
-    $: userStore.subscribe((value) => {
-        user = value;
-    });
+    // Bejelentkezési idő mentése
+    function setLoginTime() {
+        if (typeof window !== "undefined") {
+            const loginTime = Date.now(); // Az aktuális idő
+            localStorage.setItem("loginTime", loginTime);
+        }
+    }
+
+    // Visszaszámláló frissítése
+    function updateCountdown() {
+        if (typeof window !== "undefined") {
+            const loginTime = localStorage.getItem("loginTime");
+            if (loginTime) {
+                const elapsed = Date.now() - loginTime;
+                const remaining = 600000 - elapsed; // 24 óra milliszekundumban
+                countdown = Math.max(0, remaining); // Ha elértük a 0-t, akkor ne menjünk negatívba
+            }
+        }
+    }
 
     // Kijelentkezés funkció
     function logout(event) {
@@ -14,11 +30,47 @@
 
         if (typeof window !== "undefined") {
             localStorage.removeItem("jwtToken"); // Törli a jwtToken-t
+            localStorage.removeItem("loginTime"); // Törli a bejelentkezési időt
+            localStorage.clear(); // Eltávolít minden adatot a localStorage-ból
         }
 
         isLoggedIn.set(false); // Beállítjuk, hogy a felhasználó ki van jelentkezve
         userStore.set({ username: "", email: "" }); // Ürítjük a userStore-t
         window.location.href = "/"; // Átirányítás a főoldalra
+    }
+
+    // Automatikus kijelentkezés, ha lejárt a 24 óra
+    function checkAutoLogout() {
+        updateCountdown();
+        if (countdown <= 0) {
+            logout({ preventDefault: () => {} }); // Kijelentkezés, ha lejárt a 24 óra
+        }
+    }
+
+    // Figyeljük a userStore-t, és frissítjük a user adatokat
+    $: userStore.subscribe((value) => {
+        user = value;
+    });
+
+    // Indítsuk el a visszaszámlálót
+    $: {
+        if ($isLoggedIn) {
+            const loginTime = localStorage.getItem("loginTime");
+            if (!loginTime) {
+                setLoginTime(); // Ha még nincs mentett idő, akkor mentjük el
+            }
+            countdownInterval = setInterval(checkAutoLogout, 1000); // Frissítjük másodpercenként
+        } else {
+            clearInterval(countdownInterval); // Ha kijelentkezett, leállítjuk a visszaszámlálót
+        }
+    }
+
+    // Az oldal betöltésekor ellenőrizzük a visszaszámlálót
+    updateCountdown();
+
+    // Formázza a visszaszámláló órát, percet és másodpercet kétjegyű számokká
+    function formatTimeUnit(unit) {
+        return String(unit).padStart(2, '0'); // 1 -> "01", 10 -> "10"
     }
 </script>
 
@@ -64,8 +116,9 @@
             <small>{user.email}</small><br>
             
             {#if user.roles && user.roles.length > 0}
-                <small class="role">Szerepkör: {user.roles[0]}</small>
+            <small class="role">Szerepkör: {user.roles[0]}</small><br>
             {/if}
+            <small class="countdown">{formatTimeUnit(Math.floor(countdown / 1000 / 60 / 60))}:{formatTimeUnit(Math.floor(countdown / 1000 / 60) % 60)}:{formatTimeUnit(Math.floor(countdown / 1000) % 60)}</small>
         </div>
     </nav>
 </div>
@@ -108,6 +161,7 @@
         margin-top: auto;
         padding-top: 20px;
         border-top: 1px solid #dee2e6;
+        color: #6c757d;
     }
 
     .user-info h5 {
@@ -115,13 +169,13 @@
         font-size: 18px;
     }
 
-    .user-info small {
-        color: #6c757d;
-    }
-
     .user-info .role {
-        color: #6c757d;
         font-size: 14px;
         margin-top: 5px;
+    }
+
+    .countdown {
+        font-size: 14px;
+        color: gray;
     }
 </style>
