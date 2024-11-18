@@ -142,7 +142,7 @@
             <form on:submit={login}>
                 <div class="mb-3">
                     <label for="username" class="form-label"
-                        >Felhasználónév</label
+                        >Felhasználónév (a @ előtti rész az emailből)</label
                     >
                     <input
                         type="text"
