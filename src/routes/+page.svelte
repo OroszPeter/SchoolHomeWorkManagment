@@ -123,7 +123,7 @@
     <div class="dashboard-container">
         <div class="content my-5 mx-3">
             <h2>Dashboard</h2>
-            <p>Válaszd ki a menüpontot a jobb oldali menüből a kezdéshez.</p>
+            <p>Válaszd ki a menüpontot a bal oldali menüből a kezdéshez.</p>
         </div>
     </div>
 {:else}
