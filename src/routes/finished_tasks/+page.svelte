@@ -11,6 +11,9 @@
     let selectedSubmission = null;
     let gradeInput = "";
 
+    let selectedAssignment = "all"; // Alapértelmezett: mindent megjelenít
+    let assignmentNames = []; // Egyedi feladatnevek listája
+
     function checkLogin() {
         token = localStorage.getItem("jwtToken");
         loggedIn = !!token;
@@ -33,7 +36,10 @@
             }
 
             const data = await response.json();
-            submissions = data;
+            // Rendezés a beadási idő szerint csökkenő sorrendben
+            submissions = data.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+            // Egyedi feladatnevek kigyűjtése
+            assignmentNames = [...new Set(submissions.map(sub => sub.assignment.assignmentName))];
         } catch (error) {
             errorMessage = error.message;
         } finally {
@@ -134,6 +140,17 @@
     <div class="container my-5">
         <h2 class="mb-4">Beadott Feladatok</h2>
 
+        <!-- Dropdown szűrő -->
+        <div class="filter-container mb-4">
+            <label for="assignmentFilter" class="form-label">Szűrés feladat szerint:</label>
+            <select id="assignmentFilter" bind:value={selectedAssignment} class="form-select">
+                <option value="all">Összes feladat</option>
+                {#each assignmentNames as name}
+                    <option value={name}>{name}</option>
+                {/each}
+            </select>
+        </div>
+
         <!-- Submissions Table -->
         <table class="table table-striped">
             <thead>
@@ -147,7 +164,7 @@
                 </tr>
             </thead>
             <tbody>
-                {#each submissions as submission}
+                {#each submissions.filter(sub => selectedAssignment === "all" || sub.assignment.assignmentName === selectedAssignment) as submission}
                     <tr>
                         <td>{submission.assignment.assignmentName}</td>
                         <td>{submission.user.firstName} {submission.user.lastName}</td>
@@ -243,5 +260,13 @@
         display: flex;
         justify-content: flex-end;
         width: 100%;
+    }
+    .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .filter-container label {
+        font-weight: bold;
     }
 </style>
