@@ -88,7 +88,7 @@
                 <i class="bi bi-upload"></i> Feladat beadása
             </a>
             <a href="/result">
-                <i class="bi bi-check"></i> Beadott feladatok
+                <i class="bi bi-check"></i> Eredmények
             </a>
         {/if}
 
